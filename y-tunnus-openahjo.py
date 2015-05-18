@@ -3,6 +3,7 @@ import pprint
 import re
 import csv
 
+#gittesti
 #hakee openahjo-rajapinnasta y-tunnus maskilla ulos listan y-tunnuksia halutun maaran
 #openahjo apin alustus
 haku_parametrit = {'page': 1,
