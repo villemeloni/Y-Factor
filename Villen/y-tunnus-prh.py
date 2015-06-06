@@ -36,12 +36,13 @@ for tunnus in tunnukset:
     		firmat.append(tunnus)
     		firmat.append(item['name'].encode('utf-8'))
     		firmat.append('\n')
-    		print item['addresses'][0]['street']
-    		#if 'addresses' in item:
-    			#firmat.append(item['addresses'][0]['street'].encode('utf-8'))
-   	 		#pitaa viela poimia kaikki street esiintymat tuolta talteen - Petri tekee esimerki javascriptilla
-	
-    	
+    		try:
+    			print item['addresses'][0]['street']
+    		except: 
+    			print 'sorry, no address' 
+
+			#firmat.append(item['addresses'][0]['street'].encode('utf-8'))
+   	 		
 #tuotetaan csv-tiedosto
 out = csv.writer(open("yritykset.csv","w"), delimiter=',',quoting=csv.QUOTE_ALL)
 out.writerow(firmat)
