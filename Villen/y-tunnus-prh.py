@@ -60,27 +60,17 @@ def query_prhapi():
 
             print 'OK, data available'
             for item in data['results']:
-                firmat.append(tunnus)
-                firmat.append(item['name'].encode('utf-8'))
-                print (item['name'].encode('utf-8'))
-                try:
-                    print item['addresses'][0]['street']
-                    firmat.append(item['addresses'][0]['street'].encode('utf-8'))
-                except: 
-                    print 'Sorry, no address'
-                try:
-                    print item['addresses'][0]['postCode']    
-                    firmat.append(item['addresses'][0]['postCode'].encode('utf-8'))
-                except: 
-                    print 'Sorry, no post code'
-                try:
-                    print item['addresses'][0]['city']    
-                    firmat.append(item['addresses'][0]['city'].encode('utf-8'))
-                except:
-                    print 'Sorry, no city'
-                kaikkifirmat.append(firmat)
-                firmat = []
-        
+                firma = [tunnus]  # Create a new list form firma data
+                firma.append(item['name'])
+                if 'addresses' in item and len(item['addresses']) > 0:
+                    address = item['addresses'][0]
+                    firma.append(address.get('street', ''))
+                    firma.append(address.get('postCode', ''))
+                    firma.append(address.get('city', ''))
+                firma = [x.encode('utf-8') for x in firma]
+                print firma
+                kaikkifirmat.append(firma)
+
         else:
             print 'Sorry, no data available'
         
