@@ -11,100 +11,100 @@ import csv
 import numpy as np
 
 def load_companyids_list():
-	#loading list of companyids from a given csv-files
-	print "LOADING COMPANY IDs"
-	global ytunnukset
-	ytunnukset = []
-	#Loading in company IDs aka y-tunnukset
-	data=np.loadtxt(r'ahjo-output-20-clean-test.csv',dtype=str,delimiter=';',skiprows=1,usecols=(1,))
+    #loading list of companyids from a given csv-files
+    print "LOADING COMPANY IDs"
+    global ytunnukset
+    ytunnukset = []
+    #Loading in company IDs aka y-tunnukset
+    data=np.loadtxt(r'ahjo-output-20-clean-test.csv',dtype=str,delimiter=';',skiprows=1,usecols=(1,))
 
-	#Reading company IDs to a new list that will be used for further API querying
-	ytunnukset = data.tolist()
-	print ytunnukset
-	return ytunnukset
+    #Reading company IDs to a new list that will be used for further API querying
+    ytunnukset = data.tolist()
+    print ytunnukset
+    return ytunnukset
 
 #printing companyidlist 
 #print ytunnukset
 
 def query_prhapi(): 
-	#fetching data from the prh api
-	print "QUERY PRHAPI"
-	#setting parameters for querying paten registry office api
-	global tunnukset
-	tunnukset = ytunnukset
-	haku_parametrit = {'businessId': '',
+    #fetching data from the prh api
+    print "QUERY PRHAPI"
+    #setting parameters for querying paten registry office api
+    global tunnukset
+    tunnukset = ytunnukset
+    haku_parametrit = {'businessId': '',
                  }         
-	endpoint = "http://avoindata.prh.fi:80/bis/v1/"
+    endpoint = "http://avoindata.prh.fi:80/bis/v1/"
 
-	#creating a onte time list to store result of each companyid query
-	global firmat
-	firmat = []
+    #creating a onte time list to store result of each companyid query
+    global firmat
+    firmat = []
 
-	#creating a list of lists to aggregate each companyid query to
-	#could also be a dictionary like firmat = {}
-	csvheader = ['CompanyID','Name','Address','Postcode','City']
-	global kaikkifirmat
-	kaikkifirmat = []
-	kaikkifirmat.append(csvheader)
+    #creating a list of lists to aggregate each companyid query to
+    #could also be a dictionary like firmat = {}
+    csvheader = ['CompanyID','Name','Address','Postcode','City']
+    global kaikkifirmat
+    kaikkifirmat = []
+    kaikkifirmat.append(csvheader)
 
-	#using companyid list to query prh-api
+    #using companyid list to query prh-api
 
-	for tunnus in tunnukset:
-  	  haku_parametrit['businessId'] = tunnus
-  	  response = requests.get(endpoint, params=haku_parametrit)
-  	  data = response.json()
- 	  #print response status
- 	  print response.status_code
-  	  #storing data to list only if status ok 200
-  	  if response.status_code == 200:
+    for tunnus in tunnukset:
+        haku_parametrit['businessId'] = tunnus
+        response = requests.get(endpoint, params=haku_parametrit)
+        data = response.json()
+        #print response status
+        print response.status_code
+        #storing data to list only if status ok 200
+        if response.status_code == 200:
 
-  	  	print 'OK, data available'
-    		for item in data['results']:
-    			firmat.append(tunnus)
-    			firmat.append(item['name'].encode('utf-8'))
-    			print (item['name'].encode('utf-8'))
-    			try:
-    				print item['addresses'][0]['street']
-    				firmat.append(item['addresses'][0]['street'].encode('utf-8'))
-    			except: 
-    				print 'Sorry, no address'
-    			try:
-    				print item['addresses'][0]['postCode']	
-    				firmat.append(item['addresses'][0]['postCode'].encode('utf-8'))
-    			except: 
-    				print 'Sorry, no post code'
-    			try:
-    				print item['addresses'][0]['city']	
-    				firmat.append(item['addresses'][0]['city'].encode('utf-8'))
-    			except:
-    				print 'Sorry, no city'
-    			kaikkifirmat.append(firmat)
-    			firmat = []
-  	  
-  	  else:
-  	  	print 'Sorry, no data available'
-  	  
-	#print 'kaikkifirmat tallessa'
-	#print kaikkifirmat
-	#return kaikkifirmat
+            print 'OK, data available'
+            for item in data['results']:
+                firmat.append(tunnus)
+                firmat.append(item['name'].encode('utf-8'))
+                print (item['name'].encode('utf-8'))
+                try:
+                    print item['addresses'][0]['street']
+                    firmat.append(item['addresses'][0]['street'].encode('utf-8'))
+                except: 
+                    print 'Sorry, no address'
+                try:
+                    print item['addresses'][0]['postCode']    
+                    firmat.append(item['addresses'][0]['postCode'].encode('utf-8'))
+                except: 
+                    print 'Sorry, no post code'
+                try:
+                    print item['addresses'][0]['city']    
+                    firmat.append(item['addresses'][0]['city'].encode('utf-8'))
+                except:
+                    print 'Sorry, no city'
+                kaikkifirmat.append(firmat)
+                firmat = []
+        
+        else:
+            print 'Sorry, no data available'
+        
+    #print 'kaikkifirmat tallessa'
+    #print kaikkifirmat
+    #return kaikkifirmat
 
 def print_companies():
-	#printing the list with company id, company name and address and postcode to the screen
-	print 'PRINTING COMPANIES'    			
-	pprint.pprint(kaikkifirmat)
+    #printing the list with company id, company name and address and postcode to the screen
+    print 'PRINTING COMPANIES'                
+    pprint.pprint(kaikkifirmat)
 
 def companydata_csv():
-	#creating csv-file with company info
-	print "WRITING CSV"
-	out = csv.writer(open("yritykset.csv","w"), delimiter=',',quoting=csv.QUOTE_ALL)
-	out.writerows(kaikkifirmat)
+    #creating csv-file with company info
+    print "WRITING CSV"
+    out = csv.writer(open("yritykset.csv","w"), delimiter=',',quoting=csv.QUOTE_ALL)
+    out.writerows(kaikkifirmat)
 
 def main():
-	#main function that calls the other functions
-	load_companyids_list()
-	query_prhapi()
-	print_companies()
-	companydata_csv()
+    #main function that calls the other functions
+    load_companyids_list()
+    query_prhapi()
+    print_companies()
+    companydata_csv()
 
 main()
 
@@ -116,11 +116,11 @@ main()
 ###used lists within list to solve it
 """
 For fetching more data for example
-    			try:
-    				print item['businessLines'][0]['code']
-    				firmat.append(item['businessLines'][0]['code'].encode('utf-8'))
-    				print item['businessLines'][0]['name']
-    				firmat.append(item['businessLines'][0]['name'].encode('utf-8'))
-    			except: 
-    				print 'sorry, no businessline info'
+                try:
+                    print item['businessLines'][0]['code']
+                    firmat.append(item['businessLines'][0]['code'].encode('utf-8'))
+                    print item['businessLines'][0]['name']
+                    firmat.append(item['businessLines'][0]['name'].encode('utf-8'))
+                except: 
+                    print 'sorry, no businessline info'
 """
